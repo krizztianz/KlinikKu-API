@@ -1,6 +1,6 @@
-# 📚 Book Library API
+# 📚 KlinikKU API
 
-API sederhana untuk manajemen buku dan kategori, dengan autentikasi JWT dan dokumentasi Swagger.
+API sederhana untuk manajemen operasional Klinik/Puskesmas, dengan autentikasi JWT dan dokumentasi Swagger.
 
 ## 🚀 Jalankan Proyek
 
@@ -17,12 +17,12 @@ API sederhana untuk manajemen buku dan kategori, dengan autentikasi JWT dan doku
 
 Login ke API:
 
-POST /api/users/login
+POST /api/auth/login
 Content-Type: application/json
 
 {
   "username": "admin",
-  "password": "Rahasia123"
+  "password": "password123"
 }
 
 Response:
@@ -50,20 +50,20 @@ Login
 
     Method: POST
 
-    URL: http://localhost:8080/api/users/login
+    URL: http://localhost:8080/api/auth/login
 
     Body (raw JSON):
 
 {
   "username": "admin",
-  "password": "Rahasia123"
+  "password": "password123"
 }
 
-Get All Books
+Get All Kunjungan
 
     Method: GET
 
-    URL: http://localhost:8080/api/books
+    URL: http://localhost:8080/api/kunjungan
 
     Header:
 
