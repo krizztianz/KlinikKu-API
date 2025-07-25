@@ -1,0 +1,26 @@
+package dto
+
+type CreatePasienRequest struct {
+	Nama          string  `json:"nama" binding:"required"`
+	TanggalLahir  string  `json:"tanggal_lahir" binding:"required"`
+	JenisKelamin  string  `json:"jenis_kelamin" binding:"required"` // Enum: L/P
+	Alamat        string  `json:"alamat" binding:"required"`
+	NoHP          string  `json:"no_hp" binding:"required"`
+	NoTelepon     *string `json:"no_telepon,omitempty"`
+	KTP           string  `json:"ktp" binding:"required"`
+	Email         *string `json:"email,omitempty"`
+	GolonganDarah *string `json:"golongan_darah,omitempty"` // Enum: A/B/AB/O
+}
+
+type PasienResponse struct {
+	PasienID      int     `json:"pasien_id"`
+	Nama          string  `json:"nama"`
+	TanggalLahir  string  `json:"tanggal_lahir"`
+	JenisKelamin  string  `json:"jenis_kelamin"`
+	Alamat        string  `json:"alamat"`
+	NoHP          string  `json:"no_hp"`
+	NoTelepon     *string `json:"no_telepon,omitempty"`
+	KTP           string  `json:"ktp"`
+	Email         *string `json:"email,omitempty"`
+	GolonganDarah *string `json:"golongan_darah,omitempty"`
+}

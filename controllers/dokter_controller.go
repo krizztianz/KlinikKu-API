@@ -1,0 +1,196 @@
+package controllers
+
+import (
+	"KlinikKu/dto"
+	"database/sql"
+	"net/http"
+
+	"github.com/gin-gonic/gin"
+)
+
+func CreateDokter(c *gin.Context) {
+	var input dto.CreateDokterRequest
+	if err := c.ShouldBindJSON(&input); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	_, err := db.Exec(`
+		INSERT INTO dokter (no_izin_praktek, nama, tanggal_lahir, jenis_kelamin, alamat, no_hp, no_telepon, ktp, email)
+		VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9)
+	`, input.NoIzinPraktek, input.Nama, input.TanggalLahir, input.JenisKelamin,
+		input.Alamat, input.NoHP, input.NoTelepon, input.KTP, input.Email)
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Gagal menambahkan dokter"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Dokter berhasil ditambahkan"})
+}
+
+func GetAllDokter(c *gin.Context) {
+	rows, err := db.Query(`SELECT dokter_id, nama, no_hp FROM dokter`)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Gagal mengambil data dokter"})
+		return
+	}
+	defer rows.Close()
+
+	var allDokter []dto.DokterWithSpesialisasi
+
+	for rows.Next() {
+		var d dto.DokterWithSpesialisasi
+		if err := rows.Scan(&d.DokterID, &d.Nama, &d.NoHP); err != nil {
+			continue
+		}
+
+		// Ambil spesialisasi untuk tiap dokter
+		spesialisasiRows, err := db.Query(`
+			SELECT s.spesialisasi_id, s.kode_spesialisasi, s.nama_spesialisasi
+			FROM dokter_spesialisasi ds
+			JOIN spesialisasi s ON s.spesialisasi_id = ds.spesialisasi_id
+			WHERE ds.dokter_id = $1
+		`, d.DokterID)
+		if err == nil {
+			for spesialisasiRows.Next() {
+				var s dto.SpesialisasiSimpleDTO
+				spesialisasiRows.Scan(&s.SpesialisasiID, &s.KodeSpesialisasi, &s.NamaSpesialisasi)
+				d.Spesialisasi = append(d.Spesialisasi, s)
+			}
+			spesialisasiRows.Close()
+		}
+
+		allDokter = append(allDokter, d)
+	}
+
+	c.JSON(http.StatusOK, allDokter)
+}
+
+func GetDokterByID(c *gin.Context) {
+	id := c.Param("id")
+
+	var dokter dto.DokterWithSpesialisasi
+	err := db.QueryRow(`SELECT dokter_id, nama, no_hp FROM dokter WHERE dokter_id = $1`, id).
+		Scan(&dokter.DokterID, &dokter.Nama, &dokter.NoHP)
+
+	if err == sql.ErrNoRows {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Dokter tidak ditemukan"})
+		return
+	} else if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Gagal mengambil dokter"})
+		return
+	}
+
+	// Ambil spesialisasi dokter
+	rows, err := db.Query(`
+		SELECT s.spesialisasi_id, s.kode_spesialisasi, s.nama_spesialisasi
+		FROM dokter_spesialisasi ds
+		JOIN spesialisasi s ON s.spesialisasi_id = ds.spesialisasi_id
+		WHERE ds.dokter_id = $1
+	`, id)
+
+	if err == nil {
+		defer rows.Close()
+		for rows.Next() {
+			var s dto.SpesialisasiSimpleDTO
+			rows.Scan(&s.SpesialisasiID, &s.KodeSpesialisasi, &s.NamaSpesialisasi)
+			dokter.Spesialisasi = append(dokter.Spesialisasi, s)
+		}
+	}
+
+	c.JSON(http.StatusOK, dokter)
+}
+
+func UpdateDokter(c *gin.Context) {
+	dokterID := c.Param("id")
+	var input dto.CreateDokterRequest
+	if err := c.ShouldBindJSON(&input); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	res, err := db.Exec(`
+		UPDATE dokter SET
+			no_izin_praktek=$1,
+			nama=$2,
+			tanggal_lahir=$3,
+			jenis_kelamin=$4,
+			alamat=$5,
+			no_hp=$6,
+			no_telepon=$7,
+			ktp=$8,
+			email=$9
+		WHERE dokter_id=$10
+	`, input.NoIzinPraktek, input.Nama, input.TanggalLahir, input.JenisKelamin,
+		input.Alamat, input.NoHP, input.NoTelepon, input.KTP, input.Email, dokterID)
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Gagal update data dokter"})
+		return
+	}
+
+	rows, _ := res.RowsAffected()
+	if rows == 0 {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Dokter tidak ditemukan"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Data dokter diperbarui"})
+}
+
+func DeleteDokter(c *gin.Context) {
+	dokterID := c.Param("id")
+	res, err := db.Exec(`DELETE FROM dokter WHERE dokter_id = $1`, dokterID)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Gagal hapus dokter"})
+		return
+	}
+
+	rows, _ := res.RowsAffected()
+	if rows == 0 {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Dokter tidak ditemukan"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Dokter berhasil dihapus"})
+}
+
+func AssignSpesialisasiToDokter(c *gin.Context) {
+	dokterID := c.Param("id")
+
+	var body struct {
+		SpesialisasiID int `json:"spesialisasi_id" binding:"required"`
+	}
+	if err := c.ShouldBindJSON(&body); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid input"})
+		return
+	}
+
+	_, err := db.Exec(`
+		INSERT INTO dokter_spesialisasi (dokter_id, spesialisasi_id)
+		VALUES ($1, $2) ON CONFLICT DO NOTHING
+	`, dokterID, body.SpesialisasiID)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Gagal menambahkan spesialisasi ke dokter"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Spesialisasi berhasil ditambahkan ke dokter"})
+}
+
+func RemoveSpesialisasiFromDokter(c *gin.Context) {
+	dokterID := c.Param("id")
+	spesialisasiID := c.Param("spesialisasi_id")
+
+	_, err := db.Exec(`
+		DELETE FROM dokter_spesialisasi
+		WHERE dokter_id = $1 AND spesialisasi_id = $2
+	`, dokterID, spesialisasiID)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Gagal menghapus spesialisasi dari dokter"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Spesialisasi berhasil dihapus dari dokter"})
+}
