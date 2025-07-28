@@ -11,6 +11,7 @@ import (
 )
 
 // CreateUser - Tambah user baru
+// @Summary CreateUser// @Tags User// @Accept json// @Produce json// @Param Authorization header string true "Bearer Token"// @Security ApiKeyAuth// @Success 200 {object} map[string]interface{}// @Failure 400 {object} map[string]interface{}// @Failure 500 {object} map[string]interface{}// @Router /user [post]
 func CreateUser(c *gin.Context) {
 	var input dto.CreateUserRequest
 	if err := c.ShouldBindJSON(&input); err != nil {
@@ -37,6 +38,7 @@ func CreateUser(c *gin.Context) {
 }
 
 // GetAllUsers - Ambil semua user
+// @Summary GetAllUsers// @Tags User// @Accept json// @Produce json// @Param Authorization header string true "Bearer Token"// @Security ApiKeyAuth// @Success 200 {object} map[string]interface{}// @Failure 400 {object} map[string]interface{}// @Failure 500 {object} map[string]interface{}// @Router /user [get]
 func GetAllUsers(c *gin.Context) {
 	rows, err := db.Query(`
 		SELECT user_id, username, nama_lengkap, role, dokter_id
@@ -61,6 +63,7 @@ func GetAllUsers(c *gin.Context) {
 }
 
 // GetUserByID - Ambil user berdasarkan ID
+// @Summary GetUserByID// @Tags User// @Accept json// @Produce json// @Param Authorization header string true "Bearer Token"// @Security ApiKeyAuth// @Success 200 {object} map[string]interface{}// @Failure 400 {object} map[string]interface{}// @Failure 500 {object} map[string]interface{}// @Router /user/{id} [get]
 func GetUserByID(c *gin.Context) {
 	id := c.Param("id")
 
@@ -82,6 +85,7 @@ func GetUserByID(c *gin.Context) {
 }
 
 // UpdateUser - Ubah data user
+// @Summary UpdateUser// @Tags User// @Accept json// @Produce json// @Param Authorization header string true "Bearer Token"// @Security ApiKeyAuth// @Success 200 {object} map[string]interface{}// @Failure 400 {object} map[string]interface{}// @Failure 500 {object} map[string]interface{}// @Router /user/{id} [put]
 func UpdateUser(c *gin.Context) {
 	id := c.Param("id")
 	var input dto.CreateUserRequest
@@ -125,6 +129,7 @@ func UpdateUser(c *gin.Context) {
 }
 
 // DeleteUser - Hapus user berdasarkan ID
+// @Summary DeleteUser// @Tags User// @Accept json// @Produce json// @Param Authorization header string true "Bearer Token"// @Security ApiKeyAuth// @Success 200 {object} map[string]interface{}// @Failure 400 {object} map[string]interface{}// @Failure 500 {object} map[string]interface{}// @Router /user/{id} [delete]
 func DeleteUser(c *gin.Context) {
 	id := c.Param("id")
 	res, err := db.Exec(`DELETE FROM users WHERE user_id = $1`, id)

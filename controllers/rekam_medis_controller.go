@@ -11,6 +11,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// @Summary CreateRekamMedis// @Tags Rekam_medis// @Accept json// @Produce json// @Param Authorization header string true "Bearer Token"// @Security ApiKeyAuth// @Success 200 {object} map[string]interface{}// @Failure 400 {object} map[string]interface{}// @Failure 500 {object} map[string]interface{}// @Router /rekam_medis [post]
 func CreateRekamMedis(c *gin.Context) {
 	var input struct {
 		dto.CreateRekamMedisRequest
@@ -78,6 +79,7 @@ func CreateRekamMedis(c *gin.Context) {
 	})
 }
 
+// @Summary GetRekamMedisByID// @Tags Rekam_medis// @Accept json// @Produce json// @Param Authorization header string true "Bearer Token"// @Security ApiKeyAuth// @Success 200 {object} map[string]interface{}// @Failure 400 {object} map[string]interface{}// @Failure 500 {object} map[string]interface{}// @Router /rekam_medis/{id} [get]
 func GetRekamMedisByID(c *gin.Context) {
 	rekamMedisID := c.Param("id")
 
@@ -167,6 +169,7 @@ func GetRekamMedisByID(c *gin.Context) {
 	c.JSON(http.StatusOK, result)
 }
 
+// @Summary GetRekamMedisByKunjungan// @Tags Rekam_medis// @Accept json// @Produce json// @Param Authorization header string true "Bearer Token"// @Security ApiKeyAuth// @Success 200 {object} map[string]interface{}// @Failure 400 {object} map[string]interface{}// @Failure 500 {object} map[string]interface{}// @Router /rekam_medis [get]
 func GetRekamMedisByKunjungan(c *gin.Context) {
 	kunjunganID := c.Param("id")
 

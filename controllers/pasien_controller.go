@@ -11,6 +11,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// @Summary GetAllPasien// @Tags Pasien// @Accept json// @Produce json// @Param Authorization header string true "Bearer Token"// @Security ApiKeyAuth// @Success 200 {object} map[string]interface{}// @Failure 400 {object} map[string]interface{}// @Failure 500 {object} map[string]interface{}// @Router /pasien [get]
 func GetAllPasien(c *gin.Context) {
 	rows, err := db.Query(`
 		SELECT pasien_id, nama, tanggal_lahir, jenis_kelamin, alamat, 
@@ -39,6 +40,7 @@ func GetAllPasien(c *gin.Context) {
 	c.JSON(http.StatusOK, result)
 }
 
+// @Summary SearchPasien// @Tags Pasien// @Accept json// @Produce json// @Param Authorization header string true "Bearer Token"// @Security ApiKeyAuth// @Success 200 {object} map[string]interface{}// @Failure 400 {object} map[string]interface{}// @Failure 500 {object} map[string]interface{}// @Router /pasien [get]
 func SearchPasien(c *gin.Context) {
 	ktp := c.Query("ktp")
 	noHP := c.Query("no_hp")
@@ -98,6 +100,7 @@ func SearchPasien(c *gin.Context) {
 	c.JSON(http.StatusOK, results)
 }
 
+// @Summary CreatePasien// @Tags Pasien// @Accept json// @Produce json// @Param Authorization header string true "Bearer Token"// @Security ApiKeyAuth// @Success 200 {object} map[string]interface{}// @Failure 400 {object} map[string]interface{}// @Failure 500 {object} map[string]interface{}// @Router /pasien [post]
 func CreatePasien(c *gin.Context) {
 	var input dto.CreatePasienRequest
 	if err := c.ShouldBindJSON(&input); err != nil {
@@ -130,6 +133,7 @@ func CreatePasien(c *gin.Context) {
 	c.JSON(http.StatusCreated, gin.H{"message": "Pasien berhasil ditambahkan"})
 }
 
+// @Summary UpdatePasien// @Tags Pasien// @Accept json// @Produce json// @Param Authorization header string true "Bearer Token"// @Security ApiKeyAuth// @Success 200 {object} map[string]interface{}// @Failure 400 {object} map[string]interface{}// @Failure 500 {object} map[string]interface{}// @Router /pasien/{id} [put]
 func UpdatePasien(c *gin.Context) {
 	pasienID, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
@@ -175,6 +179,7 @@ func UpdatePasien(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "Pasien berhasil diperbarui"})
 }
 
+// @Summary DeletePasien// @Tags Pasien// @Accept json// @Produce json// @Param Authorization header string true "Bearer Token"// @Security ApiKeyAuth// @Success 200 {object} map[string]interface{}// @Failure 400 {object} map[string]interface{}// @Failure 500 {object} map[string]interface{}// @Router /pasien/{id} [delete]
 func DeletePasien(c *gin.Context) {
 	pasienID := c.Param("id")
 

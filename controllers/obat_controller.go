@@ -11,6 +11,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// @Summary CreateObat// @Tags Obat// @Accept json// @Produce json// @Param Authorization header string true "Bearer Token"// @Security ApiKeyAuth// @Success 200 {object} map[string]interface{}// @Failure 400 {object} map[string]interface{}// @Failure 500 {object} map[string]interface{}// @Router /obat [post]
 func CreateObat(c *gin.Context) {
 	var input dto.CreateObatRequest
 	if err := c.ShouldBindJSON(&input); err != nil {
@@ -37,6 +38,7 @@ func CreateObat(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "Obat berhasil dibuat", "obat_id": id})
 }
 
+// @Summary GetAllObat// @Tags Obat// @Accept json// @Produce json// @Param Authorization header string true "Bearer Token"// @Security ApiKeyAuth// @Success 200 {object} map[string]interface{}// @Failure 400 {object} map[string]interface{}// @Failure 500 {object} map[string]interface{}// @Router /obat [get]
 func GetAllObat(c *gin.Context) {
 	rows, err := db.Query(`
 		SELECT obat_id, nama_obat, deskripsi, stok, harga, satuan
@@ -60,6 +62,7 @@ func GetAllObat(c *gin.Context) {
 	c.JSON(http.StatusOK, obats)
 }
 
+// @Summary GetObatByID// @Tags Obat// @Accept json// @Produce json// @Param Authorization header string true "Bearer Token"// @Security ApiKeyAuth// @Success 200 {object} map[string]interface{}// @Failure 400 {object} map[string]interface{}// @Failure 500 {object} map[string]interface{}// @Router /obat/{id} [get]
 func GetObatByID(c *gin.Context) {
 	id := c.Param("id")
 	var o models.Obat
@@ -79,6 +82,7 @@ func GetObatByID(c *gin.Context) {
 	c.JSON(http.StatusOK, o)
 }
 
+// @Summary UpdateObat// @Tags Obat// @Accept json// @Produce json// @Param Authorization header string true "Bearer Token"// @Security ApiKeyAuth// @Success 200 {object} map[string]interface{}// @Failure 400 {object} map[string]interface{}// @Failure 500 {object} map[string]interface{}// @Router /obat/{id} [put]
 func UpdateObat(c *gin.Context) {
 	obatID, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
@@ -112,6 +116,7 @@ func UpdateObat(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "Obat berhasil diperbarui"})
 }
 
+// @Summary DeleteObat// @Tags Obat// @Accept json// @Produce json// @Param Authorization header string true "Bearer Token"// @Security ApiKeyAuth// @Success 200 {object} map[string]interface{}// @Failure 400 {object} map[string]interface{}// @Failure 500 {object} map[string]interface{}// @Router /obat/{id} [delete]
 func DeleteObat(c *gin.Context) {
 	id := c.Param("id")
 

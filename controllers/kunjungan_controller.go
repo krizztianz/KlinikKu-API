@@ -11,6 +11,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// @Summary CreateKunjungan// @Tags Kunjungan// @Accept json// @Produce json// @Param Authorization header string true "Bearer Token"// @Security ApiKeyAuth// @Success 200 {object} map[string]interface{}// @Failure 400 {object} map[string]interface{}// @Failure 500 {object} map[string]interface{}// @Router /kunjungan [post]
 func CreateKunjungan(c *gin.Context) {
 	var input dto.CreateKunjunganRequest
 	if err := c.ShouldBindJSON(&input); err != nil {
@@ -51,6 +52,7 @@ func CreateKunjungan(c *gin.Context) {
 	c.JSON(http.StatusCreated, gin.H{"message": "Kunjungan berhasil dibuat", "kunjungan_id": kunjunganID})
 }
 
+// @Summary GetKunjunganList// @Tags Kunjungan// @Accept json// @Produce json// @Param Authorization header string true "Bearer Token"// @Security ApiKeyAuth// @Success 200 {object} map[string]interface{}// @Failure 400 {object} map[string]interface{}// @Failure 500 {object} map[string]interface{}// @Router /kunjungan [get]
 func GetKunjunganList(c *gin.Context) {
 	status := c.Query("status")
 	rows, err := db.Query(`
@@ -78,6 +80,7 @@ func GetKunjunganList(c *gin.Context) {
 	c.JSON(http.StatusOK, results)
 }
 
+// @Summary UpdateKunjunganStatus// @Tags Kunjungan// @Accept json// @Produce json// @Param Authorization header string true "Bearer Token"// @Security ApiKeyAuth// @Success 200 {object} map[string]interface{}// @Failure 400 {object} map[string]interface{}// @Failure 500 {object} map[string]interface{}// @Router /kunjungan/{id} [put]
 func UpdateKunjunganStatus(c *gin.Context) {
 	kunjunganID := c.Param("id")
 	var input dto.UpdateStatusKunjunganRequest

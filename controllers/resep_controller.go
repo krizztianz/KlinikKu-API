@@ -10,6 +10,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// @Summary GetAllResep// @Tags Resep// @Accept json// @Produce json// @Param Authorization header string true "Bearer Token"// @Security ApiKeyAuth// @Success 200 {object} map[string]interface{}// @Failure 400 {object} map[string]interface{}// @Failure 500 {object} map[string]interface{}// @Router /resep [get]
 func GetAllResep(c *gin.Context) {
 	rows, err := db.Query(`
 		SELECT resep_id, rekam_medis_id, created_at, status
@@ -67,6 +68,7 @@ func GetAllResep(c *gin.Context) {
 	c.JSON(http.StatusOK, resepList)
 }
 
+// @Summary CreateResep// @Tags Resep// @Accept json// @Produce json// @Param Authorization header string true "Bearer Token"// @Security ApiKeyAuth// @Success 200 {object} map[string]interface{}// @Failure 400 {object} map[string]interface{}// @Failure 500 {object} map[string]interface{}// @Router /resep [post]
 func CreateResep(c *gin.Context) {
 	var input dto.CreateResepRequest
 	if err := c.ShouldBindJSON(&input); err != nil {
@@ -123,6 +125,7 @@ func CreateResep(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "Resep berhasil disimpan", "resep_id": resepID})
 }
 
+// @Summary GetResepByID// @Tags Resep// @Accept json// @Produce json// @Param Authorization header string true "Bearer Token"// @Security ApiKeyAuth// @Success 200 {object} map[string]interface{}// @Failure 400 {object} map[string]interface{}// @Failure 500 {object} map[string]interface{}// @Router /resep/{id} [get]
 func GetResepByID(c *gin.Context) {
 	id := c.Param("id")
 
@@ -173,6 +176,7 @@ func GetResepByID(c *gin.Context) {
 	})
 }
 
+// @Summary GetResepByRekamMedisID// @Tags Resep// @Accept json// @Produce json// @Param Authorization header string true "Bearer Token"// @Security ApiKeyAuth// @Success 200 {object} map[string]interface{}// @Failure 400 {object} map[string]interface{}// @Failure 500 {object} map[string]interface{}// @Router /resep [get]
 func GetResepByRekamMedisID(c *gin.Context) {
 	rekamMedisID := c.Param("id")
 
@@ -225,6 +229,7 @@ func GetResepByRekamMedisID(c *gin.Context) {
 	})
 }
 
+// @Summary GetResepMenunggu// @Tags Resep// @Accept json// @Produce json// @Param Authorization header string true "Bearer Token"// @Security ApiKeyAuth// @Success 200 {object} map[string]interface{}// @Failure 400 {object} map[string]interface{}// @Failure 500 {object} map[string]interface{}// @Router /resep [get]
 func GetResepMenunggu(c *gin.Context) {
 	rows, err := db.Query(`
 		SELECT 

@@ -10,6 +10,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// @Summary CreateDiagnosa// @Tags Diagnosa// @Accept json// @Produce json// @Param Authorization header string true "Bearer Token"// @Security ApiKeyAuth// @Success 200 {object} map[string]interface{}// @Failure 400 {object} map[string]interface{}// @Failure 500 {object} map[string]interface{}// @Router /diagnosa [post]
 func CreateDiagnosa(c *gin.Context) {
 	var input dto.CreateDiagnosaRequest
 	if err := c.ShouldBindJSON(&input); err != nil {
@@ -35,6 +36,7 @@ func CreateDiagnosa(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "Diagnosa berhasil ditambahkan"})
 }
 
+// @Summary GetAllDiagnosa// @Tags Diagnosa// @Accept json// @Produce json// @Param Authorization header string true "Bearer Token"// @Security ApiKeyAuth// @Success 200 {object} map[string]interface{}// @Failure 400 {object} map[string]interface{}// @Failure 500 {object} map[string]interface{}// @Router /diagnosa [get]
 func GetAllDiagnosa(c *gin.Context) {
 	rows, err := db.Query(`
 		SELECT diagnosa_id, kode_icd10, nama_diagnosa, deskripsi
@@ -57,6 +59,7 @@ func GetAllDiagnosa(c *gin.Context) {
 	c.JSON(http.StatusOK, result)
 }
 
+// @Summary UpdateDiagnosa// @Tags Diagnosa// @Accept json// @Produce json// @Param Authorization header string true "Bearer Token"// @Security ApiKeyAuth// @Success 200 {object} map[string]interface{}// @Failure 400 {object} map[string]interface{}// @Failure 500 {object} map[string]interface{}// @Router /diagnosa/{id} [put]
 func UpdateDiagnosa(c *gin.Context) {
 	id := c.Param("id")
 	var input dto.CreateDiagnosaRequest
@@ -98,6 +101,7 @@ func UpdateDiagnosa(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "Diagnosa diperbarui"})
 }
 
+// @Summary DeleteDiagnosa// @Tags Diagnosa// @Accept json// @Produce json// @Param Authorization header string true "Bearer Token"// @Security ApiKeyAuth// @Success 200 {object} map[string]interface{}// @Failure 400 {object} map[string]interface{}// @Failure 500 {object} map[string]interface{}// @Router /diagnosa/{id} [delete]
 func DeleteDiagnosa(c *gin.Context) {
 	id := c.Param("id")
 	res, err := db.Exec(`DELETE FROM diagnosa WHERE diagnosa_id = $1`, id)

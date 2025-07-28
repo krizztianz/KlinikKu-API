@@ -10,6 +10,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// @Summary GetPendingResep// @Tags Farmasi// @Accept json// @Produce json// @Param Authorization header string true "Bearer Token"// @Security ApiKeyAuth// @Success 200 {object} map[string]interface{}// @Failure 400 {object} map[string]interface{}// @Failure 500 {object} map[string]interface{}// @Router /farmasi [get]
 func GetPendingResep(c *gin.Context) {
 	rows, err := db.Query(`
 		SELECT r.resep_id, p.nama AS nama_pasien, d.nama AS nama_dokter, r.created_at
@@ -44,6 +45,7 @@ func GetPendingResep(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"resep": resepList})
 }
 
+// @Summary GetResepDetail// @Tags Farmasi// @Accept json// @Produce json// @Param Authorization header string true "Bearer Token"// @Security ApiKeyAuth// @Success 200 {object} map[string]interface{}// @Failure 400 {object} map[string]interface{}// @Failure 500 {object} map[string]interface{}// @Router /farmasi/{id} [get]
 func GetResepDetail(c *gin.Context) {
 	id := c.Param("id")
 
@@ -58,6 +60,7 @@ func GetResepDetail(c *gin.Context) {
 	GetResepByID(c)
 }
 
+// @Summary MarkResepAsCompleted// @Tags Farmasi// @Accept json// @Produce json// @Param Authorization header string true "Bearer Token"// @Security ApiKeyAuth// @Success 200 {object} map[string]interface{}// @Failure 400 {object} map[string]interface{}// @Failure 500 {object} map[string]interface{}// @Router /farmasi [get]
 func MarkResepAsCompleted(c *gin.Context) {
 	id := c.Param("id")
 	resepID, _ := strconv.Atoi(id)
