@@ -9,7 +9,7 @@ import (
 
 func RegisterRekamMedisRoutes(rg *gin.RouterGroup) {
 	rekam := rg.Group("/rekam-medis")
-	rekam.Use(middleware.AuthMiddleware(), middleware.RequireRole("dokter"))
+	rekam.Use(middleware.AuthMiddleware(), middleware.InjectUserToContext(), middleware.RequireRole("dokter"))
 	{
 		rekam.POST("/", controllers.CreateRekamMedis)
 		rekam.GET("/:id", middleware.RequireRole("dokter", "admin"), controllers.GetRekamMedisByID)

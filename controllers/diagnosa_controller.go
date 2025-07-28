@@ -2,6 +2,9 @@ package controllers
 
 import (
 	"KlinikKu/dto"
+	"KlinikKu/middleware"
+	"KlinikKu/utils"
+	"database/sql"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -14,10 +17,15 @@ func CreateDiagnosa(c *gin.Context) {
 		return
 	}
 
-	_, err := db.Exec(`
-		INSERT INTO diagnosa (kode_icd10, nama_diagnosa, deskripsi)
-		VALUES ($1, $2, $3)
-	`, input.KodeICD10, input.NamaDiagnosa, input.Deskripsi)
+	createdBy := middleware.GetUsername(c)
+
+	err := utils.RunTx(db, func(tx *sql.Tx) error {
+		_, err := tx.Exec(`
+			INSERT INTO diagnosa (kode_icd10, nama_diagnosa, deskripsi, created_by)
+			VALUES ($1, $2, $3, $4)
+		`, input.KodeICD10, input.NamaDiagnosa, input.Deskripsi, createdBy)
+		return err
+	})
 
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Gagal menambahkan diagnosa"})
@@ -28,7 +36,9 @@ func CreateDiagnosa(c *gin.Context) {
 }
 
 func GetAllDiagnosa(c *gin.Context) {
-	rows, err := db.Query(`SELECT diagnosa_id, kode_icd10, nama_diagnosa, deskripsi FROM diagnosa ORDER BY diagnosa_id`)
+	rows, err := db.Query(`
+		SELECT diagnosa_id, kode_icd10, nama_diagnosa, deskripsi
+		FROM diagnosa ORDER BY diagnosa_id`)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Gagal mengambil data diagnosa"})
 		return
@@ -55,22 +65,33 @@ func UpdateDiagnosa(c *gin.Context) {
 		return
 	}
 
-	res, err := db.Exec(`
-		UPDATE diagnosa SET 
-			kode_icd10 = $1,
-			nama_diagnosa = $2,
-			deskripsi = $3
-		WHERE diagnosa_id = $4
-	`, input.KodeICD10, input.NamaDiagnosa, input.Deskripsi, id)
+	modifiedBy := middleware.GetUsername(c)
 
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Gagal update diagnosa"})
-		return
-	}
+	err := utils.RunTx(db, func(tx *sql.Tx) error {
+		res, err := tx.Exec(`
+			UPDATE diagnosa SET 
+				kode_icd10 = $1,
+				nama_diagnosa = $2,
+				deskripsi = $3,
+				modified_by = $4,
+				modified_at = CURRENT_TIMESTAMP
+			WHERE diagnosa_id = $5
+		`, input.KodeICD10, input.NamaDiagnosa, input.Deskripsi, modifiedBy, id)
+		if err != nil {
+			return err
+		}
+		affected, _ := res.RowsAffected()
+		if affected == 0 {
+			return sql.ErrNoRows
+		}
+		return nil
+	})
 
-	rows, _ := res.RowsAffected()
-	if rows == 0 {
+	if err == sql.ErrNoRows {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Diagnosa tidak ditemukan"})
+		return
+	} else if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Gagal update diagnosa"})
 		return
 	}
 

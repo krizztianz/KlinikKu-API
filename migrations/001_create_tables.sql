@@ -6,6 +6,7 @@ DO $$ BEGIN IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'blood_type') T
 DO $$ BEGIN IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'visit_type') THEN CREATE TYPE visit_type AS ENUM ('Umum', 'Rawat Jalan', 'Kontrol'); END IF; END $$;
 DO $$ BEGIN IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'visit_status') THEN CREATE TYPE visit_status AS ENUM ('registrasi', 'pemeriksaan', 'menunggu_resep', 'selesai', 'batal'); END IF; END $$;
 DO $$ BEGIN IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'visit_priority') THEN CREATE TYPE visit_priority AS ENUM ('normal', 'prioritas'); END IF; END $$;
+DO $$ BEGIN IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'resep_status') THEN CREATE TYPE resep_status AS ENUM ('menunggu', 'selesai'); END IF; END $$;
 
 -- MASTER TABLES
 CREATE TABLE IF NOT EXISTS pasien (
@@ -91,7 +92,7 @@ CREATE TABLE IF NOT EXISTS kunjungan (
     kunjungan_id SERIAL PRIMARY KEY,
     pasien_id INT NOT NULL REFERENCES pasien(pasien_id) ON DELETE RESTRICT ON UPDATE CASCADE,
     dokter_id INT NOT NULL REFERENCES dokter(dokter_id) ON DELETE RESTRICT ON UPDATE CASCADE,
-    tanggal_kunjungan TIMESTAMP,
+    tanggal_kunjungan TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     keluhan TEXT NOT NULL,
     tinggi_badan NUMERIC(3,1),
     berat_badan NUMERIC(3,2),
@@ -99,7 +100,11 @@ CREATE TABLE IF NOT EXISTS kunjungan (
     suhu_tubuh NUMERIC(3,1),
     jenis_kunjungan visit_type,
     status visit_status NOT NULL,
-    prioritas visit_priority DEFAULT 'normal'
+    prioritas visit_priority DEFAULT 'normal',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    created_by VARCHAR(255) NULL,
+    modified_at TIMESTAMP NULL,
+    modified_by VARCHAR(255) NULL
 );
 
 CREATE TABLE IF NOT EXISTS rekam_medis (
@@ -140,6 +145,7 @@ CREATE TABLE IF NOT EXISTS rekam_medis_tindakan (
 CREATE TABLE IF NOT EXISTS users (
     user_id SERIAL PRIMARY KEY,
     username VARCHAR(50) NOT NULL UNIQUE,
+    nama_lengkap VARCHAR(50) NOT NULL,
     password TEXT NOT NULL,
     role VARCHAR(20) NOT NULL CHECK (role IN ('admin', 'frontliner', 'dokter', 'farmasi')),
     dokter_id INT REFERENCES dokter(dokter_id) ON DELETE SET NULL,
@@ -166,3 +172,4 @@ DROP TYPE IF EXISTS blood_type;
 DROP TYPE IF EXISTS visit_type;
 DROP TYPE IF EXISTS visit_status;
 DROP TYPE IF EXISTS visit_priority;
+DROP TYPE IF EXISTS resep_status;

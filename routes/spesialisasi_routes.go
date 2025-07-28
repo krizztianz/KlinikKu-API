@@ -9,7 +9,7 @@ import (
 
 func RegisterSpesialisasiRoutes(rg *gin.RouterGroup) {
 	sp := rg.Group("/spesialisasi")
-	sp.Use(middleware.AuthMiddleware(), middleware.RequireRole("admin"))
+	sp.Use(middleware.AuthMiddleware(), middleware.InjectUserToContext(), middleware.RequireRole("admin"))
 	{
 		sp.POST("/", controllers.CreateSpesialisasi)
 		sp.GET("/", controllers.GetAllSpesialisasi)

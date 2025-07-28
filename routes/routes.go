@@ -13,6 +13,7 @@ func SetupRoutes(r *gin.Engine) {
 		{
 			auth.POST("/login", controllers.LoginHandler)
 			auth.POST("/refresh", controllers.RefreshHandler)
+			auth.POST("/generate", controllers.GeneratePassword)
 		}
 
 		RegisterDokterRoutes(api)
@@ -23,5 +24,8 @@ func SetupRoutes(r *gin.Engine) {
 		RegisterTindakanRoutes(api)
 		RegisterDiagnosaRoutes(api)
 		RegisterResepRoutes(api)
+		RegisterFarmasiRoutes(api)
+		RegisterObatRoutes(api)
+		RegisterUserRoutes(api)
 	}
 }

@@ -49,3 +49,28 @@ func RequireRole(allowedRoles ...string) gin.HandlerFunc {
 		c.AbortWithStatusJSON(http.StatusForbidden, gin.H{"error": "Insufficient permissions"})
 	}
 }
+
+func InjectUserToContext() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		claims, exists := c.Get("claims")
+		if !exists {
+			c.Next()
+			return
+		}
+
+		if userClaims, ok := claims.(*utils.JWTClaims); ok {
+			c.Set("created_by", userClaims.Username)
+			c.Set("modified_by", userClaims.Username)
+		}
+
+		c.Next()
+	}
+}
+
+func GetUsername(c *gin.Context) string {
+	username, _ := c.Get("username")
+	if s, ok := username.(string); ok {
+		return s
+	}
+	return "unknown"
+}

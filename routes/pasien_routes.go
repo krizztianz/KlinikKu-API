@@ -9,14 +9,14 @@ import (
 
 func RegisterPasienRoutes(rg *gin.RouterGroup) {
 	adminPasien := rg.Group("/pasien")
-	adminPasien.Use(middleware.AuthMiddleware(), middleware.RequireRole("admin"))
+	adminPasien.Use(middleware.AuthMiddleware(), middleware.InjectUserToContext(), middleware.RequireRole("admin"))
 	{
 		adminPasien.PUT("/:id", controllers.UpdatePasien)
 		adminPasien.DELETE("/:id", controllers.DeletePasien)
 	}
 
 	sharedPasien := rg.Group("/pasien")
-	sharedPasien.Use(middleware.AuthMiddleware(), middleware.RequireRole("frontliner", "admin"))
+	sharedPasien.Use(middleware.AuthMiddleware(), middleware.InjectUserToContext(), middleware.RequireRole("frontliner", "admin"))
 	{
 		sharedPasien.GET("/", controllers.GetAllPasien)
 		sharedPasien.GET("/search", controllers.SearchPasien)

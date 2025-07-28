@@ -15,7 +15,9 @@ type JWTClaims struct {
 	jwt.RegisteredClaims
 }
 
-var jwtKey = []byte(os.Getenv("JWT_SECRET"))
+func getJWTKey() []byte {
+	return []byte(os.Getenv("JWT_SECRET"))
+}
 
 func GenerateJWT(userID int, username, role string) (string, error) {
 	claims := &JWTClaims{
@@ -28,12 +30,12 @@ func GenerateJWT(userID int, username, role string) (string, error) {
 		},
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	return token.SignedString(jwtKey)
+	return token.SignedString(getJWTKey())
 }
 
 func ValidateJWT(tokenStr string) (*JWTClaims, error) {
 	token, err := jwt.ParseWithClaims(tokenStr, &JWTClaims{}, func(t *jwt.Token) (interface{}, error) {
-		return jwtKey, nil
+		return getJWTKey(), nil
 	})
 	if err != nil || !token.Valid {
 		return nil, errors.New("invalid token")
@@ -51,5 +53,5 @@ func GenerateRefreshToken() (string, error) {
 		IssuedAt:  jwt.NewNumericDate(time.Now()),
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	return token.SignedString(jwtKey)
+	return token.SignedString(getJWTKey())
 }

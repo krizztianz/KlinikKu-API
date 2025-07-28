@@ -2,6 +2,8 @@ package controllers
 
 import (
 	"KlinikKu/dto"
+	"KlinikKu/utils"
+	"database/sql"
 	"fmt"
 	"net/http"
 	"time"
@@ -17,32 +19,36 @@ func CreateKunjungan(c *gin.Context) {
 	}
 
 	tgl := time.Now()
+	createdBy := c.GetString("username")
 
 	var kunjunganID int
-	err := db.QueryRow(`
-		INSERT INTO kunjungan (pasien_id, dokter_id, tanggal_kunjungan, keluhan, jenis_kunjungan, status, prioritas)
-		VALUES ($1, $2, $3, $4, $5, 'registrasi', COALESCE($6, 'normal'))
-		RETURNING kunjungan_id
-	`, input.PasienID, input.DokterID, tgl, input.Keluhan, input.JenisKunjungan, input.Prioritas).
-		Scan(&kunjunganID)
+	err := utils.RunTx(db, func(tx *sql.Tx) error {
+		return tx.QueryRow(`
+			INSERT INTO kunjungan (
+				pasien_id, dokter_id, tanggal_kunjungan,
+				keluhan, jenis_kunjungan, status, prioritas,
+				created_by
+			)
+			VALUES (
+				$1, $2, $3, $4,
+				$5::visit_type,
+				'registrasi'::visit_status,
+				COALESCE($6, 'normal')::visit_priority,
+				$7
+			)
+			RETURNING kunjungan_id
+		`, input.PasienID, input.DokterID, tgl, input.Keluhan, input.JenisKunjungan, input.Prioritas, createdBy).
+			Scan(&kunjunganID)
+	})
 
 	if err != nil {
+		fmt.Println("Input:", input)
+		fmt.Println("Error tx:", err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Gagal menyimpan kunjungan"})
 		return
 	}
 
-	resp := dto.KunjunganResponse{
-		KunjunganID:      kunjunganID,
-		PasienID:         input.PasienID,
-		DokterID:         input.DokterID,
-		TanggalKunjungan: tgl.Format("2006-01-02 15:04:05"),
-		Keluhan:          input.Keluhan,
-		JenisKunjungan:   input.JenisKunjungan,
-		Status:           "registrasi",
-		Prioritas:        input.Prioritas,
-	}
-
-	c.JSON(http.StatusOK, resp)
+	c.JSON(http.StatusCreated, gin.H{"message": "Kunjungan berhasil dibuat", "kunjungan_id": kunjunganID})
 }
 
 func GetKunjunganList(c *gin.Context) {
@@ -50,9 +56,10 @@ func GetKunjunganList(c *gin.Context) {
 	rows, err := db.Query(`
 		SELECT kunjungan_id, pasien_id, dokter_id, tanggal_kunjungan, keluhan, jenis_kunjungan, status, prioritas
 		FROM kunjungan
-		WHERE ($1 = '' OR status = $1)
+		WHERE ($1 = '' OR status = $1::visit_status)
 		ORDER BY tanggal_kunjungan DESC`, status)
 	if err != nil {
+		fmt.Println(err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Gagal mengambil data kunjungan"})
 		return
 	}
@@ -81,48 +88,52 @@ func UpdateKunjunganStatus(c *gin.Context) {
 	}
 
 	newStatus := input.Status
+	modifiedBy := c.GetString("username")
 
-	// Cek status sebelumnya
-	var currentStatus string
-	err := db.QueryRow(`SELECT status FROM kunjungan WHERE kunjungan_id = $1`, kunjunganID).
-		Scan(&currentStatus)
-	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": "Kunjungan tidak ditemukan"})
-		return
-	}
-
-	// Validasi transisi status yang sah
-	allowedTransitions := map[string][]string{
-		"registrasi":     {"pemeriksaan", "batal"},
-		"pemeriksaan":    {"menunggu_resep", "batal"},
-		"menunggu_resep": {"selesai", "batal"},
-	}
-
-	allowedNext, exists := allowedTransitions[currentStatus]
-	if !exists {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Transisi dari status ini tidak diperbolehkan"})
-		return
-	}
-
-	valid := false
-	for _, s := range allowedNext {
-		if newStatus == s {
-			valid = true
-			break
+	err := utils.RunTx(db, func(tx *sql.Tx) error {
+		var currentStatus string
+		err := tx.QueryRow(`SELECT status FROM kunjungan WHERE kunjungan_id = $1`, kunjunganID).
+			Scan(&currentStatus)
+		if err != nil {
+			return err
 		}
-	}
 
-	if !valid {
-		msg := fmt.Sprintf("Transisi status dari '%s' ke '%s' tidak diperbolehkan", currentStatus, newStatus)
-		c.JSON(http.StatusBadRequest, gin.H{"error": msg})
-		return
-	}
+		allowedTransitions := map[string][]string{
+			"registrasi":     {"pemeriksaan", "batal"},
+			"pemeriksaan":    {"menunggu_resep", "batal"},
+			"menunggu_resep": {"selesai", "batal"},
+		}
 
-	_, err = db.Exec(`UPDATE kunjungan SET status = $1 WHERE kunjungan_id = $2`, newStatus, kunjunganID)
+		allowedNext, exists := allowedTransitions[currentStatus]
+		if !exists {
+			return fmt.Errorf("Transisi dari status ini tidak diperbolehkan")
+		}
+
+		valid := false
+		for _, s := range allowedNext {
+			if newStatus == s {
+				valid = true
+				break
+			}
+		}
+
+		if !valid {
+			return fmt.Errorf("Transisi status tidak valid")
+		}
+
+		_, err = tx.Exec(`
+			UPDATE kunjungan 
+			SET status = $1::visit_status, modified_at = CURRENT_TIMESTAMP, modified_by = $2
+			WHERE kunjungan_id = $3
+		`, newStatus, modifiedBy, kunjunganID)
+
+		return err
+	})
+
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Gagal update status kunjungan"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"message": "Status kunjungan diperbarui"})
+	c.JSON(http.StatusOK, gin.H{"message": "Status kunjungan berhasil diupdate"})
 }

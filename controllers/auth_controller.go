@@ -88,3 +88,26 @@ func RefreshHandler(c *gin.Context) {
 		"refresh_token": newRefreshToken,
 	})
 }
+
+func GeneratePassword(c *gin.Context) {
+	var req struct {
+		Password string `json:"password"`
+	}
+
+	if err := c.ShouldBindJSON(&req); err != nil || req.Password == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid Password"})
+		return
+	}
+
+	pass, err := utils.HashPassword(req.Password)
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to Geneate token"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"Plain Text": req.Password,
+		"Password":   pass,
+	})
+}

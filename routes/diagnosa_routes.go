@@ -9,7 +9,7 @@ import (
 
 func RegisterDiagnosaRoutes(rg *gin.RouterGroup) {
 	diagnosa := rg.Group("/diagnosa")
-	diagnosa.Use(middleware.AuthMiddleware(), middleware.RequireRole("admin"))
+	diagnosa.Use(middleware.AuthMiddleware(), middleware.InjectUserToContext(), middleware.RequireRole("admin"))
 	{
 		diagnosa.POST("/", controllers.CreateDiagnosa)
 		diagnosa.GET("/", controllers.GetAllDiagnosa)

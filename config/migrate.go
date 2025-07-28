@@ -2,6 +2,7 @@ package config
 
 import (
 	"database/sql"
+	"fmt"
 	"log"
 
 	migrate "github.com/rubenv/sql-migrate"
@@ -9,6 +10,7 @@ import (
 
 // RunMigrations menjalankan semua migration dari folder /migrations
 func RunMigrations(db *sql.DB) {
+	fmt.Println("Menjalankan migration....")
 	migrations := &migrate.FileMigrationSource{
 		Dir: "migrations",
 	}

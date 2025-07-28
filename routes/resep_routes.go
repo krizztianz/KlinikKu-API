@@ -9,10 +9,12 @@ import (
 
 func RegisterResepRoutes(rg *gin.RouterGroup) {
 	resep := rg.Group("/resep")
-	resep.Use(middleware.AuthMiddleware(), middleware.RequireRole("dokter"))
+	resep.Use(middleware.AuthMiddleware(), middleware.InjectUserToContext())
 	{
-		resep.POST("/", controllers.CreateResep)
+		resep.GET("/", middleware.RequireRole("admin", "dokter", "farmasi"), controllers.GetAllResep)
+		resep.POST("/", middleware.RequireRole("dokter"), controllers.CreateResep)
 		resep.GET("/:id", middleware.RequireRole("dokter", "admin", "farmasi"), controllers.GetResepByID)
 		resep.GET("/by-rekam-medis/:id", middleware.RequireRole("dokter", "admin", "farmasi"), controllers.GetResepByRekamMedisID)
+		resep.GET("/menunggu", middleware.RequireRole("farmasi", "admin"), controllers.GetResepMenunggu)
 	}
 }

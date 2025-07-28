@@ -2,6 +2,9 @@ package controllers
 
 import (
 	"KlinikKu/dto"
+	"KlinikKu/middleware"
+	"KlinikKu/utils"
+	"database/sql"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -14,10 +17,15 @@ func CreateSpesialisasi(c *gin.Context) {
 		return
 	}
 
-	_, err := db.Exec(`
-		INSERT INTO spesialisasi (kode_spesialisasi, nama_spesialisasi, deskripsi)
-		VALUES ($1, $2, $3)
-	`, input.KodeSpesialisasi, input.NamaSpesialisasi, input.Deskripsi)
+	createdBy := middleware.GetUsername(c)
+
+	err := utils.RunTx(db, func(tx *sql.Tx) error {
+		_, err := tx.Exec(`
+			INSERT INTO spesialisasi (kode_spesialisasi, nama_spesialisasi, deskripsi, created_by)
+			VALUES ($1, $2, $3, $4)
+		`, input.KodeSpesialisasi, input.NamaSpesialisasi, input.Deskripsi, createdBy)
+		return err
+	})
 
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Gagal menambahkan spesialisasi"})
@@ -57,22 +65,33 @@ func UpdateSpesialisasi(c *gin.Context) {
 		return
 	}
 
-	res, err := db.Exec(`
-		UPDATE spesialisasi SET 
-			kode_spesialisasi = $1,
-			nama_spesialisasi = $2,
-			deskripsi = $3
-		WHERE spesialisasi_id = $4
-	`, input.KodeSpesialisasi, input.NamaSpesialisasi, input.Deskripsi, id)
+	modifiedBy := middleware.GetUsername(c)
 
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Gagal update spesialisasi"})
-		return
-	}
+	err := utils.RunTx(db, func(tx *sql.Tx) error {
+		res, err := tx.Exec(`
+			UPDATE spesialisasi SET 
+				kode_spesialisasi = $1,
+				nama_spesialisasi = $2,
+				deskripsi = $3,
+				modified_by = $4,
+				modified_at = CURRENT_TIMESTAMP
+			WHERE spesialisasi_id = $5
+		`, input.KodeSpesialisasi, input.NamaSpesialisasi, input.Deskripsi, modifiedBy, id)
+		if err != nil {
+			return err
+		}
+		affected, _ := res.RowsAffected()
+		if affected == 0 {
+			return sql.ErrNoRows
+		}
+		return nil
+	})
 
-	rows, _ := res.RowsAffected()
-	if rows == 0 {
+	if err == sql.ErrNoRows {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Spesialisasi tidak ditemukan"})
+		return
+	} else if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Gagal update spesialisasi"})
 		return
 	}
 

@@ -9,7 +9,7 @@ import (
 
 func RegisterTindakanRoutes(rg *gin.RouterGroup) {
 	tindakan := rg.Group("/tindakan")
-	tindakan.Use(middleware.AuthMiddleware(), middleware.RequireRole("admin"))
+	tindakan.Use(middleware.AuthMiddleware(), middleware.InjectUserToContext(), middleware.RequireRole("admin"))
 	{
 		tindakan.POST("/", controllers.CreateTindakan)
 		tindakan.GET("/", controllers.GetAllTindakan)

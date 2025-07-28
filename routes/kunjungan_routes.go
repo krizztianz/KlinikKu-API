@@ -9,10 +9,10 @@ import (
 
 func RegisterKunjunganRoutes(rg *gin.RouterGroup) {
 	kunjungan := rg.Group("/kunjungan")
-	kunjungan.Use(middleware.AuthMiddleware())
+	kunjungan.Use(middleware.AuthMiddleware(), middleware.InjectUserToContext())
 	{
 		kunjungan.POST("/", middleware.RequireRole("frontliner", "admin"), controllers.CreateKunjungan)
 		kunjungan.GET("/", middleware.RequireRole("frontliner", "dokter", "farmasi", "admin"), controllers.GetKunjunganList)
-		kunjungan.PUT("/:id/status", middleware.RequireRole("dokter", "farmasi", "admin"), controllers.UpdateKunjunganStatus)
+		kunjungan.PUT("/:id/status", middleware.RequireRole("dokter", "frontliner", "farmasi", "admin"), controllers.UpdateKunjunganStatus)
 	}
 }
