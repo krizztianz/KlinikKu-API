@@ -10,7 +10,16 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// @Summary CreateDokter// @Tags Dokter// @Accept json// @Produce json// @Param Authorization header string true "Bearer Token"// @Security ApiKeyAuth// @Success 200 {object} map[string]interface{}// @Failure 400 {object} map[string]interface{}// @Failure 500 {object} map[string]interface{}// @Router /dokter [post]
+// @Summary CreateDokter
+// @Tags Dokter
+// @Accept json
+// @Produce json
+// @Security ApiKeyAuth
+// @Success 200 {object} map[string]interface{}
+// @Failure 400 {object} map[string]interface{}
+// @Failure 500 {object} map[string]interface{}
+// @Router /create-dokter [post]
+
 func CreateDokter(c *gin.Context) {
 	var input dto.CreateDokterRequest
 	if err := c.ShouldBindJSON(&input); err != nil {
@@ -39,7 +48,16 @@ func CreateDokter(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "Dokter berhasil ditambahkan"})
 }
 
-// @Summary GetAllDokter// @Tags Dokter// @Accept json// @Produce json// @Param Authorization header string true "Bearer Token"// @Security ApiKeyAuth// @Success 200 {object} map[string]interface{}// @Failure 400 {object} map[string]interface{}// @Failure 500 {object} map[string]interface{}// @Router /dokter [get]
+// @Summary GetAllDokter
+// @Tags Dokter
+// @Accept json
+// @Produce json
+// @Security ApiKeyAuth
+// @Success 200 {object} map[string]interface{}
+// @Failure 400 {object} map[string]interface{}
+// @Failure 500 {object} map[string]interface{}
+// @Router /get-all-dokter [get]
+
 func GetAllDokter(c *gin.Context) {
 	rows, err := db.Query(`SELECT dokter_id, nama, no_hp FROM dokter`)
 	if err != nil {
@@ -78,7 +96,16 @@ func GetAllDokter(c *gin.Context) {
 	c.JSON(http.StatusOK, allDokter)
 }
 
-// @Summary GetDokterByID// @Tags Dokter// @Accept json// @Produce json// @Param Authorization header string true "Bearer Token"// @Security ApiKeyAuth// @Success 200 {object} map[string]interface{}// @Failure 400 {object} map[string]interface{}// @Failure 500 {object} map[string]interface{}// @Router /dokter/{id} [get]
+// @Summary GetDokterByID
+// @Tags Dokter
+// @Accept json
+// @Produce json
+// @Security ApiKeyAuth
+// @Success 200 {object} map[string]interface{}
+// @Failure 400 {object} map[string]interface{}
+// @Failure 500 {object} map[string]interface{}
+// @Router /get-dokter-by-i-d [get]
+
 func GetDokterByID(c *gin.Context) {
 	id := c.Param("id")
 
@@ -114,7 +141,16 @@ func GetDokterByID(c *gin.Context) {
 	c.JSON(http.StatusOK, dokter)
 }
 
-// @Summary UpdateDokter// @Tags Dokter// @Accept json// @Produce json// @Param Authorization header string true "Bearer Token"// @Security ApiKeyAuth// @Success 200 {object} map[string]interface{}// @Failure 400 {object} map[string]interface{}// @Failure 500 {object} map[string]interface{}// @Router /dokter/{id} [put]
+// @Summary UpdateDokter
+// @Tags Dokter
+// @Accept json
+// @Produce json
+// @Security ApiKeyAuth
+// @Success 200 {object} map[string]interface{}
+// @Failure 400 {object} map[string]interface{}
+// @Failure 500 {object} map[string]interface{}
+// @Router /update-dokter [put]
+
 func UpdateDokter(c *gin.Context) {
 	dokterID := c.Param("id")
 	var input dto.CreateDokterRequest
@@ -164,7 +200,16 @@ func UpdateDokter(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "Data dokter diperbarui"})
 }
 
-// @Summary DeleteDokter// @Tags Dokter// @Accept json// @Produce json// @Param Authorization header string true "Bearer Token"// @Security ApiKeyAuth// @Success 200 {object} map[string]interface{}// @Failure 400 {object} map[string]interface{}// @Failure 500 {object} map[string]interface{}// @Router /dokter/{id} [delete]
+// @Summary DeleteDokter
+// @Tags Dokter
+// @Accept json
+// @Produce json
+// @Security ApiKeyAuth
+// @Success 200 {object} map[string]interface{}
+// @Failure 400 {object} map[string]interface{}
+// @Failure 500 {object} map[string]interface{}
+// @Router /delete-dokter [delete]
+
 func DeleteDokter(c *gin.Context) {
 	dokterID := c.Param("id")
 
@@ -177,7 +222,16 @@ func DeleteDokter(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "Dokter berhasil dihapus"})
 }
 
-// @Summary AssignSpesialisasiToDokter// @Tags Dokter// @Accept json// @Produce json// @Param Authorization header string true "Bearer Token"// @Security ApiKeyAuth// @Success 200 {object} map[string]interface{}// @Failure 400 {object} map[string]interface{}// @Failure 500 {object} map[string]interface{}// @Router /dokter [get]
+// @Summary AssignSpesialisasiToDokter
+// @Tags Dokter
+// @Accept json
+// @Produce json
+// @Security ApiKeyAuth
+// @Success 200 {object} map[string]interface{}
+// @Failure 400 {object} map[string]interface{}
+// @Failure 500 {object} map[string]interface{}
+// @Router /assign-spesialisasi-to-dokter [get]
+
 func AssignSpesialisasiToDokter(c *gin.Context) {
 	dokterID := c.Param("id")
 	var body struct {
@@ -207,7 +261,16 @@ func AssignSpesialisasiToDokter(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "Spesialisasi berhasil ditambahkan ke dokter"})
 }
 
-// @Summary RemoveSpesialisasiFromDokter// @Tags Dokter// @Accept json// @Produce json// @Param Authorization header string true "Bearer Token"// @Security ApiKeyAuth// @Success 200 {object} map[string]interface{}// @Failure 400 {object} map[string]interface{}// @Failure 500 {object} map[string]interface{}// @Router /dokter [get]
+// @Summary RemoveSpesialisasiFromDokter
+// @Tags Dokter
+// @Accept json
+// @Produce json
+// @Security ApiKeyAuth
+// @Success 200 {object} map[string]interface{}
+// @Failure 400 {object} map[string]interface{}
+// @Failure 500 {object} map[string]interface{}
+// @Router /remove-spesialisasi-from-dokter [get]
+
 func RemoveSpesialisasiFromDokter(c *gin.Context) {
 	dokterID := c.Param("id")
 	spesialisasiID := c.Param("spesialisasi_id")

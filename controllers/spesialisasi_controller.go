@@ -10,7 +10,16 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// @Summary CreateSpesialisasi// @Tags Spesialisasi// @Accept json// @Produce json// @Param Authorization header string true "Bearer Token"// @Security ApiKeyAuth// @Success 200 {object} map[string]interface{}// @Failure 400 {object} map[string]interface{}// @Failure 500 {object} map[string]interface{}// @Router /spesialisasi [post]
+// @Summary CreateSpesialisasi
+// @Tags Spesialisasi
+// @Accept json
+// @Produce json
+// @Security ApiKeyAuth
+// @Success 200 {object} map[string]interface{}
+// @Failure 400 {object} map[string]interface{}
+// @Failure 500 {object} map[string]interface{}
+// @Router /create-spesialisasi [post]
+
 func CreateSpesialisasi(c *gin.Context) {
 	var input dto.CreateSpesialisasiRequest
 	if err := c.ShouldBindJSON(&input); err != nil {
@@ -36,7 +45,16 @@ func CreateSpesialisasi(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "Spesialisasi berhasil ditambahkan"})
 }
 
-// @Summary GetAllSpesialisasi// @Tags Spesialisasi// @Accept json// @Produce json// @Param Authorization header string true "Bearer Token"// @Security ApiKeyAuth// @Success 200 {object} map[string]interface{}// @Failure 400 {object} map[string]interface{}// @Failure 500 {object} map[string]interface{}// @Router /spesialisasi [get]
+// @Summary GetAllSpesialisasi
+// @Tags Spesialisasi
+// @Accept json
+// @Produce json
+// @Security ApiKeyAuth
+// @Success 200 {object} map[string]interface{}
+// @Failure 400 {object} map[string]interface{}
+// @Failure 500 {object} map[string]interface{}
+// @Router /get-all-spesialisasi [get]
+
 func GetAllSpesialisasi(c *gin.Context) {
 	rows, err := db.Query(`
 		SELECT spesialisasi_id, kode_spesialisasi, nama_spesialisasi, deskripsi
@@ -59,7 +77,16 @@ func GetAllSpesialisasi(c *gin.Context) {
 	c.JSON(http.StatusOK, result)
 }
 
-// @Summary UpdateSpesialisasi// @Tags Spesialisasi// @Accept json// @Produce json// @Param Authorization header string true "Bearer Token"// @Security ApiKeyAuth// @Success 200 {object} map[string]interface{}// @Failure 400 {object} map[string]interface{}// @Failure 500 {object} map[string]interface{}// @Router /spesialisasi/{id} [put]
+// @Summary UpdateSpesialisasi
+// @Tags Spesialisasi
+// @Accept json
+// @Produce json
+// @Security ApiKeyAuth
+// @Success 200 {object} map[string]interface{}
+// @Failure 400 {object} map[string]interface{}
+// @Failure 500 {object} map[string]interface{}
+// @Router /update-spesialisasi [put]
+
 func UpdateSpesialisasi(c *gin.Context) {
 	id := c.Param("id")
 	var input dto.CreateSpesialisasiRequest
@@ -101,7 +128,16 @@ func UpdateSpesialisasi(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "Spesialisasi diperbarui"})
 }
 
-// @Summary DeleteSpesialisasi// @Tags Spesialisasi// @Accept json// @Produce json// @Param Authorization header string true "Bearer Token"// @Security ApiKeyAuth// @Success 200 {object} map[string]interface{}// @Failure 400 {object} map[string]interface{}// @Failure 500 {object} map[string]interface{}// @Router /spesialisasi/{id} [delete]
+// @Summary DeleteSpesialisasi
+// @Tags Spesialisasi
+// @Accept json
+// @Produce json
+// @Security ApiKeyAuth
+// @Success 200 {object} map[string]interface{}
+// @Failure 400 {object} map[string]interface{}
+// @Failure 500 {object} map[string]interface{}
+// @Router /delete-spesialisasi [delete]
+
 func DeleteSpesialisasi(c *gin.Context) {
 	id := c.Param("id")
 	res, err := db.Exec(`DELETE FROM spesialisasi WHERE spesialisasi_id = $1`, id)

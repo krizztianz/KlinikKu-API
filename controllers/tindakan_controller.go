@@ -10,7 +10,16 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// @Summary CreateTindakan// @Tags Tindakan// @Accept json// @Produce json// @Param Authorization header string true "Bearer Token"// @Security ApiKeyAuth// @Success 200 {object} map[string]interface{}// @Failure 400 {object} map[string]interface{}// @Failure 500 {object} map[string]interface{}// @Router /tindakan [post]
+// @Summary CreateTindakan
+// @Tags Tindakan
+// @Accept json
+// @Produce json
+// @Security ApiKeyAuth
+// @Success 200 {object} map[string]interface{}
+// @Failure 400 {object} map[string]interface{}
+// @Failure 500 {object} map[string]interface{}
+// @Router /create-tindakan [post]
+
 func CreateTindakan(c *gin.Context) {
 	var input dto.CreateTindakanRequest
 	if err := c.ShouldBindJSON(&input); err != nil {
@@ -36,7 +45,16 @@ func CreateTindakan(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "Tindakan berhasil ditambahkan"})
 }
 
-// @Summary GetAllTindakan// @Tags Tindakan// @Accept json// @Produce json// @Param Authorization header string true "Bearer Token"// @Security ApiKeyAuth// @Success 200 {object} map[string]interface{}// @Failure 400 {object} map[string]interface{}// @Failure 500 {object} map[string]interface{}// @Router /tindakan [get]
+// @Summary GetAllTindakan
+// @Tags Tindakan
+// @Accept json
+// @Produce json
+// @Security ApiKeyAuth
+// @Success 200 {object} map[string]interface{}
+// @Failure 400 {object} map[string]interface{}
+// @Failure 500 {object} map[string]interface{}
+// @Router /get-all-tindakan [get]
+
 func GetAllTindakan(c *gin.Context) {
 	rows, err := db.Query(`
 		SELECT tindakan_id, kode_icd9, nama_tindakan, deskripsi, biaya_dasar
@@ -59,7 +77,16 @@ func GetAllTindakan(c *gin.Context) {
 	c.JSON(http.StatusOK, result)
 }
 
-// @Summary UpdateTindakan// @Tags Tindakan// @Accept json// @Produce json// @Param Authorization header string true "Bearer Token"// @Security ApiKeyAuth// @Success 200 {object} map[string]interface{}// @Failure 400 {object} map[string]interface{}// @Failure 500 {object} map[string]interface{}// @Router /tindakan/{id} [put]
+// @Summary UpdateTindakan
+// @Tags Tindakan
+// @Accept json
+// @Produce json
+// @Security ApiKeyAuth
+// @Success 200 {object} map[string]interface{}
+// @Failure 400 {object} map[string]interface{}
+// @Failure 500 {object} map[string]interface{}
+// @Router /update-tindakan [put]
+
 func UpdateTindakan(c *gin.Context) {
 	id := c.Param("id")
 	var input dto.CreateTindakanRequest
@@ -102,7 +129,16 @@ func UpdateTindakan(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "Tindakan diperbarui"})
 }
 
-// @Summary DeleteTindakan// @Tags Tindakan// @Accept json// @Produce json// @Param Authorization header string true "Bearer Token"// @Security ApiKeyAuth// @Success 200 {object} map[string]interface{}// @Failure 400 {object} map[string]interface{}// @Failure 500 {object} map[string]interface{}// @Router /tindakan/{id} [delete]
+// @Summary DeleteTindakan
+// @Tags Tindakan
+// @Accept json
+// @Produce json
+// @Security ApiKeyAuth
+// @Success 200 {object} map[string]interface{}
+// @Failure 400 {object} map[string]interface{}
+// @Failure 500 {object} map[string]interface{}
+// @Router /delete-tindakan [delete]
+
 func DeleteTindakan(c *gin.Context) {
 	id := c.Param("id")
 	res, err := db.Exec(`DELETE FROM tindakan WHERE tindakan_id = $1`, id)

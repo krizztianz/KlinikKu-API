@@ -17,7 +17,16 @@ func InitDB(database *sql.DB) {
 	db = database
 }
 
-// @Summary LoginHandler// @Tags Auth// @Accept json// @Produce json// @Param Authorization header string true "Bearer Token"// @Security ApiKeyAuth// @Success 200 {object} map[string]interface{}// @Failure 400 {object} map[string]interface{}// @Failure 500 {object} map[string]interface{}// @Router /auth [get]
+// @Summary LoginHandler
+// @Tags Auth
+// @Accept json
+// @Produce json
+// @Security ApiKeyAuth
+// @Success 200 {object} map[string]interface{}
+// @Failure 400 {object} map[string]interface{}
+// @Failure 500 {object} map[string]interface{}
+// @Router /login [post]
+
 func LoginHandler(c *gin.Context) {
 	var req struct {
 		Username string `json:"username"`
@@ -58,7 +67,16 @@ func LoginHandler(c *gin.Context) {
 	})
 }
 
-// @Summary RefreshHandler// @Tags Auth// @Accept json// @Produce json// @Param Authorization header string true "Bearer Token"// @Security ApiKeyAuth// @Success 200 {object} map[string]interface{}// @Failure 400 {object} map[string]interface{}// @Failure 500 {object} map[string]interface{}// @Router /auth [get]
+// @Summary RefreshHandler
+// @Tags Auth
+// @Accept json
+// @Produce json
+// @Security ApiKeyAuth
+// @Success 200 {object} map[string]interface{}
+// @Failure 400 {object} map[string]interface{}
+// @Failure 500 {object} map[string]interface{}
+// @Router /refresh [get]
+
 func RefreshHandler(c *gin.Context) {
 	var req struct {
 		RefreshToken string `json:"refresh_token"`
@@ -91,7 +109,16 @@ func RefreshHandler(c *gin.Context) {
 	})
 }
 
-// @Summary GeneratePassword// @Tags Auth// @Accept json// @Produce json// @Param Authorization header string true "Bearer Token"// @Security ApiKeyAuth// @Success 200 {object} map[string]interface{}// @Failure 400 {object} map[string]interface{}// @Failure 500 {object} map[string]interface{}// @Router /auth [get]
+// @Summary GeneratePassword
+// @Tags Auth
+// @Accept json
+// @Produce json
+// @Security ApiKeyAuth
+// @Success 200 {object} map[string]interface{}
+// @Failure 400 {object} map[string]interface{}
+// @Failure 500 {object} map[string]interface{}
+// @Router /generate-password [get]
+
 func GeneratePassword(c *gin.Context) {
 	var req struct {
 		Password string `json:"password"`
